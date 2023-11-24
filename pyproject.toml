@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "secret"
+version = "0.1.0"
+description = ""
+authors = ["David Ambrozio <davidambroziodev@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+selenium = "^4.15.2"
+webdriver-manager = "^4.0.1"
+
+
+[tool.poetry.group.dev.dependencies]
+ipykernel = "^6.27.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
