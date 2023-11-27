@@ -4,6 +4,7 @@ import pandas as pd
 from telegram import Bot
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from webdriver_manager.chrome import ChromeDriverManager
 from dotenv import dotenv_values
@@ -11,8 +12,13 @@ from dotenv import dotenv_values
 config = dotenv_values('.env')
 
 async def main():
+    chrome_options = Options()
+    chrome_options.add_argument('--headless')
+    chrome_options.add_argument('--disable-gpu')
+    chrome_options.add_argument('--window-size=1920x1080')
+
     service = Service(ChromeDriverManager().install())
-    driver = webdriver.Chrome(service=service)
+    driver = webdriver.Chrome(service=service, options=chrome_options)
 
     min_discount = config.get('MIN_DISCOUNT')
 
