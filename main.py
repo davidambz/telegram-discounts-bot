@@ -16,7 +16,7 @@ async def main():
 
     min_discount = config.get('MIN_DISCOUNT')
 
-    driver.get(f'https://www.kabum.com.br/ofertas/BLACKFRIDAY?pagina=1&desconto_minimo=' + min_discount + '&desconto_maximo=100')
+    driver.get(f'https://www.kabum.com.br/ofertas/cybermonday?pagina=1&desconto_minimo=' + min_discount + '&desconto_maximo=100')
 
     while(len(driver.find_elements(By.CLASS_NAME, 'nameCard'))) == 0:
         time.sleep(1)
