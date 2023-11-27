@@ -1,7 +1,7 @@
 import time
 import asyncio
 import pandas as pd
-from telegram import Bot, InputFile
+from telegram import Bot
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
