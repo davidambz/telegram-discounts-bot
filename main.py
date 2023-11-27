@@ -1,7 +1,7 @@
 import time
 import asyncio
 import pandas as pd
-from telegram import Bot
+from telegram import Bot, InputFile
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
@@ -32,6 +32,7 @@ async def main():
     oldPriceCards = driver.find_elements(By.CLASS_NAME, 'oldPriceCard')
     discountTagCards = driver.find_elements(By.CLASS_NAME, 'discountTagCard')
     productLinks = driver.find_elements(By.CLASS_NAME, 'productLink')
+    images_url = driver.find_elements(By.CLASS_NAME, 'imageCard')
 
     telegram_token = config.get('TELEGRAM_TOKEN')
     chat_id = config.get('CHAT_ID')
@@ -49,6 +50,7 @@ async def main():
     for i in range(len(nameCards)):
         product_name = nameCards[i].text
         if product_name not in sent_products:
+
             message = f'''
 <b>🚨 {product_name.upper()}</b>
 <b>Com {discountTagCards[i].text} de desconto:</b>
@@ -59,7 +61,7 @@ De: <s>{oldPriceCards[i].text}</s> | Por: <b>{priceCard[i].text}</b>
 <a href="{productLinks[i].get_attribute('href')}">{product_name}</a>
             '''
 
-            await bot.send_message(chat_id=chat_id, text=message, parse_mode='HTML')
+            await bot.send_photo(chat_id=chat_id, photo=images_url[i].get_attribute('src'), caption=message, parse_mode='HTML')
 
             new_data = pd.DataFrame({
                 'Nome': [product_name],
