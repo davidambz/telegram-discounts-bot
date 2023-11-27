@@ -8,6 +8,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from webdriver_manager.chrome import ChromeDriverManager
 from dotenv import dotenv_values
+from datetime import datetime
 
 config = dotenv_values('.env')
 
@@ -42,12 +43,14 @@ async def main():
         existing_data = pd.read_csv(csv_file)
         sent_products = set(existing_data['Nome'])
     except (FileNotFoundError, KeyError):
-        existing_data = pd.DataFrame(columns=['Nome', 'Preço', 'Preço Antigo', 'Desconto', 'Link do Produto'])
+        existing_data = pd.DataFrame(columns=['Nome', 'Preço', 'Preço Antigo', 'Desconto', 'Link do Produto', 'Data'])
         sent_products = set()
 
     for i in range(len(nameCards)):
         product_name = nameCards[i].text
         if product_name not in sent_products:
+
+            current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
             message = f'''
 <b>🚨 {product_name.upper()}</b>
@@ -66,7 +69,8 @@ De: <s>{oldPriceCards[i].text}</s> | Por: <b>{priceCard[i].text}</b>
                 'Preço': [priceCard[i].text],
                 'Preço Antigo': [oldPriceCards[i].text],
                 'Desconto': [discountTagCards[i].text],
-                'Link do Produto': [productLinks[i].get_attribute('href')]
+                'Link do Produto': [productLinks[i].get_attribute('href')],
+                'Data': [current_time]
             })
             existing_data = pd.concat([existing_data, new_data], ignore_index=True)
             existing_data.to_csv(csv_file, index=False)
