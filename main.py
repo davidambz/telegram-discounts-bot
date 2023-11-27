@@ -38,18 +38,38 @@ async def main():
 
     bot = Bot(token=telegram_token)
 
+    csv_file = 'sent_products.csv'
+    try:
+        existing_data = pd.read_csv(csv_file)
+        sent_products = set(existing_data['Nome'])
+    except (FileNotFoundError, KeyError):
+        existing_data = pd.DataFrame(columns=['Nome', 'Preço', 'Preço Antigo', 'Desconto', 'Link do Produto'])
+        sent_products = set()
+
     for i in range(len(nameCards)):
-        message = f'''
-    <b>🚨 {nameCards[i].text.upper()}</b>
-    <b>Com {discountTagCards[i].text} de desconto:</b>
-    
-    De: <s>{oldPriceCards[i].text}</s> | Por: <b>{priceCard[i].text}</b>
+        product_name = nameCards[i].text
+        if product_name not in sent_products:
+            message = f'''
+<b>🚨 {product_name.upper()}</b>
+<b>Com {discountTagCards[i].text} de desconto:</b>
 
-    <b>Link do Produto:</b>
-    <a href="{productLinks[i].get_attribute('href')}">{nameCards[i].text}</a>
-        '''
+De: <s>{oldPriceCards[i].text}</s> | Por: <b>{priceCard[i].text}</b>
 
-        await bot.send_message(chat_id=chat_id, text=message, parse_mode='HTML')
+<b>Link do Produto:</b>
+<a href="{productLinks[i].get_attribute('href')}">{product_name}</a>
+            '''
+
+            await bot.send_message(chat_id=chat_id, text=message, parse_mode='HTML')
+
+            new_data = pd.DataFrame({
+                'Nome': [product_name],
+                'Preço': [priceCard[i].text],
+                'Preço Antigo': [oldPriceCards[i].text],
+                'Desconto': [discountTagCards[i].text],
+                'Link do Produto': [productLinks[i].get_attribute('href')]
+            })
+            existing_data = pd.concat([existing_data, new_data], ignore_index=True)
+            existing_data.to_csv(csv_file, index=False)
 
 if __name__ == "__main__":
     asyncio.run(main())
