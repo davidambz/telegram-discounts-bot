@@ -23,7 +23,7 @@ async def main():
 
     driver.get(config.get('LINK_SITE'))
 
-    while(len(driver.find_elements(By.CLASS_NAME, 'nameCard'))) == 0:
+    while len(driver.find_elements(By.CLASS_NAME, 'nameCard')) == 0:
         time.sleep(1)
 
     nameCards = driver.find_elements(By.CLASS_NAME, 'nameCard')
@@ -48,11 +48,12 @@ async def main():
 
     for i in range(len(nameCards)):
         product_name = nameCards[i].text
-        if product_name not in sent_products:
+        if product_name in sent_products:
+            break
 
-            current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-            message = f'''
+        message = f'''
 <b>🚨 {product_name.upper()}</b>
 <b>Com {discountTagCards[i].text} de desconto:</b>
 
@@ -60,20 +61,20 @@ De: <s>{oldPriceCards[i].text}</s> | Por: <b>{priceCard[i].text}</b>
 
 <b>Link do Produto:</b>
 <a href="{productLinks[i].get_attribute('href')}">{product_name}</a>
-            '''
+        '''
 
-            await bot.send_photo(chat_id=chat_id, photo=images_url[i].get_attribute('src'), caption=message, parse_mode='HTML')
+        await bot.send_photo(chat_id=chat_id, photo=images_url[i].get_attribute('src'), caption=message, parse_mode='HTML')
 
-            new_data = pd.DataFrame({
-                'Nome': [product_name],
-                'Preço': [priceCard[i].text],
-                'Preço Antigo': [oldPriceCards[i].text],
-                'Desconto': [discountTagCards[i].text],
-                'Link do Produto': [productLinks[i].get_attribute('href')],
-                'Data': [current_time]
-            })
-            existing_data = pd.concat([existing_data, new_data], ignore_index=True)
-            existing_data.to_csv(csv_file, index=False)
+        new_data = pd.DataFrame({
+            'Nome': [product_name],
+            'Preço': [priceCard[i].text],
+            'Preço Antigo': [oldPriceCards[i].text],
+            'Desconto': [discountTagCards[i].text],
+            'Link do Produto': [productLinks[i].get_attribute('href')],
+            'Data': [current_time]
+        })
+        existing_data = pd.concat([existing_data, new_data], ignore_index=True)
+        existing_data.to_csv(csv_file, index=False)
 
 if __name__ == "__main__":
     asyncio.run(main())
